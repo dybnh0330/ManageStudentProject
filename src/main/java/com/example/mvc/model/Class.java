@@ -30,9 +30,9 @@ public class Class {
     private String className;
 
     @ManyToOne
-
     @JoinColumn(name="department_id", nullable=false)
     private Department department;
+
     @JsonBackReference
     public Department getDepartment(){
         return department;

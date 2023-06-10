@@ -19,9 +19,8 @@ import javax.persistence.*;
 @Setter
 public class Student {
     @Id
-
-    @Column(name = "studentId")
-    private long studentId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "studentName")
     private String studentName;

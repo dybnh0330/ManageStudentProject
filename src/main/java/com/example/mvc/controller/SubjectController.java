@@ -1,51 +1,49 @@
 package com.example.mvc.controller;
 
+import com.example.mvc.dto.SubjectRequest;
 import com.example.mvc.model.Subject;
 import com.example.mvc.service.ImplService.SubjectImplService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("Subject")
 public class SubjectController {
     @Autowired
     private SubjectImplService subjectImplService;
-    public SubjectController(SubjectImplService subjectImplService){
-        this.subjectImplService = subjectImplService;
-    }
 
-    @GetMapping(value = "/subject/getAll")
+    @GetMapping(value = "/getAll")
     public List<Subject> findAllSubject(){
         return subjectImplService.findAllSubject();
     }
 
 
-    @GetMapping(value = "/subject/findByID/{id}")
-    public void findSubjectByID(@PathVariable long id) {
-        subjectImplService.findSubjectById(id);
+    @GetMapping(value = "/findByID/{id}")
+    public Subject findSubjectByID(@PathVariable long id) {
+        return subjectImplService.findSubjectById(id);
     }
 
 
-    @GetMapping(value = "/subject/findByName/{name}")
-    public void findSubjectByName(@PathVariable String name) {
-        subjectImplService.findSubjectByName(name);
-    }
 
-    @PostMapping(value = "/subject/add")
-    public void addSubject(@RequestBody Subject subject) {
-        subjectImplService.addSubject(subject);
-    }
+    @PostMapping(value = "/add")
+    public ResponseEntity<String> addSubject(@RequestBody SubjectRequest subjectRequest) {
+        subjectImplService.addSubject(subjectRequest);
+        return ResponseEntity.ok().body("\"Add subject successfully\"");    }
 
-    @PutMapping(value = "/subject/update/{id}")
-    public void updateSubject(@RequestBody Subject subject,@PathVariable long id ) {
+    @PutMapping(value = "/update/{id}")
+    public ResponseEntity<String> updateSubject(@RequestBody Subject subject,@PathVariable long id ) {
         subjectImplService.updateSubjectByID(subject, id);
+        return ResponseEntity.ok().body("\"Update subject successfully\"");
     }
 
 
-    @DeleteMapping(value = "/subject/delete/{id}")
-    public void deleteSubject(@PathVariable long id) {
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<String> deleteSubject(@PathVariable long id) {
         subjectImplService.deleteSubjectByID(id);
+        return ResponseEntity.ok().body("\"Delete subject successfully\"");
 
     }
 }

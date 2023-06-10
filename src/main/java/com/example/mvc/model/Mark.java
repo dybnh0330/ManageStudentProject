@@ -19,9 +19,8 @@ import javax.persistence.*;
 @Getter
 public class Mark {
     @Id
-
-    @Column(name = "markId")
-    private long markId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "mark")
     private double mark;
@@ -32,7 +31,9 @@ public class Mark {
     @JsonIgnore
     private Student student;
 
-    @OneToOne(mappedBy = "mark")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
+    @JoinColumn(name = "subjectID")
     private Subject subject;
 
 

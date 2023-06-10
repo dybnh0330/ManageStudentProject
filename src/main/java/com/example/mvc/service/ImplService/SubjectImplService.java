@@ -1,26 +1,39 @@
 package com.example.mvc.service.ImplService;
 
+import com.example.mvc.dto.SubjectRequest;
+import com.example.mvc.model.Student;
 import com.example.mvc.model.Subject;
+import com.example.mvc.repository.StudentRepository;
 import com.example.mvc.repository.SubjectRepository;
 import com.example.mvc.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class SubjectImplService implements SubjectService {
     @Autowired
     private SubjectRepository subjectRepository;
-    private List<Subject> subjectList;
-//    public SubjectImplService(SubjectRepository subjectRepository){
-//        this.subjectRepository = subjectRepository;
-//
-//    }
+    @Autowired
+    private StudentRepository studentRepository;
+
+
     @Override
-    public void addSubject(Subject subject){
-        subjectRepository.save(subject);
+    public void addSubject(SubjectRequest subjectRequest){
+        Subject subjectNew = new Subject();
+        subjectNew.setSubjectName(subjectRequest.getSubjectName());
+        Optional<Student> optionalSubjectStudent = studentRepository.findById(subjectRequest.getStudentID());
+
+        if (optionalSubjectStudent.isEmpty()){
+            throw new RuntimeException("student is not existed");
+        }
+
+        subjectNew.setStudent(optionalSubjectStudent.get());
+
+        subjectRepository.save(subjectNew);
+
     }
     @Override
     public List<Subject> findAllSubject(){
@@ -28,50 +41,44 @@ public class SubjectImplService implements SubjectService {
     }
     @Override
     public void updateSubjectByID(Subject subject, long subbjectID){
-        Subject subjectFound = null;
-        for (Subject s : subjectList) {
-            if(s.getSubjectId() == subbjectID){
-                subjectFound = s;
-            }
+        Optional<Subject> optionalSubjectStudent = subjectRepository.findById(subbjectID);
+
+        if (optionalSubjectStudent.isEmpty()){
+            throw new RuntimeException("subject is not existed");
         }
 
-        assert subjectFound!= null;
-        subjectFound.setSubjectName(subject.getSubjectName());
+        optionalSubjectStudent.get().setSubjectName(subject.getSubjectName());
 
-        subjectRepository.save(subjectFound);
+        subjectRepository.save(optionalSubjectStudent.get());
 
     }
     @Override
     public void deleteSubjectByID(long subjectID){
-        Subject subjectFound = null;
-        for (Subject s: subjectList) {
-            if(s.getSubjectId() == subjectID){
-                subjectFound = s;
-            }
+        Optional<Subject> optionalSubjectStudent = subjectRepository.findById(subjectID);
+
+        if (optionalSubjectStudent.isEmpty()){
+            throw new RuntimeException("subject is not existed");
         }
 
-        assert subjectFound != null;
-        subjectRepository.delete(subjectFound);
+        subjectRepository.deleteById(subjectID);
+
+
     }
 
 
     @Override
-    public void findSubjectById(long subjectID){
-        for (Subject s: subjectList) {
-            if(s.getSubjectId() == subjectID){
-                System.out.println(s);
-            }
+    public Subject findSubjectById(long subjectID){
+        Optional<Subject> optionalSubjectStudent = subjectRepository.findById(subjectID);
+
+        if (optionalSubjectStudent.isEmpty()){
+            throw new RuntimeException("subject is not existed");
         }
+
+        return optionalSubjectStudent.get();
+
     }
 
-    @Override
-    public void findSubjectByName(String subjectName){
-        for (Subject s: subjectList) {
-            if(Objects.equals(s.getSubjectName(), subjectName)){
-                System.out.println(s);
-            }
-        }
-    }
+
 
 
 }

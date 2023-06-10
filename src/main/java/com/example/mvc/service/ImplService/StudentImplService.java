@@ -1,22 +1,24 @@
 package com.example.mvc.service.ImplService;
 
+import com.example.mvc.dto.StudentRequest;
+import com.example.mvc.model.Class;
 import com.example.mvc.model.Student;
+import com.example.mvc.repository.ClassRepository;
 import com.example.mvc.repository.StudentRepository;
 import com.example.mvc.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentImplService implements StudentService {
     @Autowired
     private StudentRepository studentRepository;
-    private List<Student> studentList;
+    @Autowired
+    private ClassRepository classRepository;
+
     private List<Student> femaleStudentList;
     private List<Student> maleStudentList;
 
@@ -25,13 +27,22 @@ public class StudentImplService implements StudentService {
     private List<Student> ZAStudentList;
 
 
-//    public StudentImplService(StudentRepository studentRepository){
-//        this.studentRepository = studentRepository;
-//
-//    }
+
     @Override
-    public void addStudent(Student student){
-        studentRepository.save(student);
+    public void addStudent(StudentRequest studentRequest){
+        Student studentNew = new Student();
+        Optional<Class> optionalClass = classRepository.findById(studentRequest.getClassID());
+        studentNew.setStudentName(studentRequest.getStudentName());
+        studentNew.setSex(studentRequest.getSex());
+        studentNew.setBirthDay(studentRequest.getBirthDay());
+
+        if(optionalClass.isEmpty()){
+            throw new RuntimeException("class not existed");
+        }
+
+        studentNew.setClasses(optionalClass.get());
+        studentRepository.save(studentNew);
+
     }
     @Override
     public List<Student> findAllStudent(){
@@ -39,54 +50,49 @@ public class StudentImplService implements StudentService {
     }
     @Override
     public void updateStudentByID(Student student, long studentID){
-        Student studentFound = null;
-        for (Student s : studentList) {
-            if(s.getStudentId() == studentID){
-                studentFound = s;
-            }
-        }
 
-        assert studentFound!= null;
-        studentFound.setStudentName(student.getStudentName());
-        studentFound.setSex(student.getSex());
-        studentFound.setBirthDay(student.getBirthDay());
-        studentRepository.save(studentFound);
+        Optional<Student> optionalStudent = studentRepository.findById(studentID);
+        if (optionalStudent.isEmpty()){
+            throw new RuntimeException("student is not existed");
+        }
+        optionalStudent.get().setStudentName(student.getStudentName());
+        optionalStudent.get().setBirthDay(student.getBirthDay());
+        optionalStudent.get().setSex(student.getSex());
+
+        studentRepository.save(optionalStudent.get());
 
     }
     @Override
     public void deleteStudentByID(long studentID){
-        Student studentFound = null;
-        for (Student s: studentList) {
-            if(s.getStudentId() == studentID){
-                studentFound = s;
-            }
+
+        Optional<Student> optionalStudent = studentRepository.findById(studentID);
+        if (optionalStudent.isEmpty()){
+            throw new RuntimeException("student is not existed");
         }
 
-        assert studentFound != null;
-        studentRepository.delete(studentFound);
+        studentRepository.delete(optionalStudent.get());
+
     }
 
 
     @Override
-    public void findStudentById(long studentID){
-        for (Student s: studentList) {
-            if(s.getStudentId() == studentID){
-                System.out.println(s);
-            }
+    public Student findStudentById(long studentID){
+
+        Optional<Student> optionalStudent = studentRepository.findById(studentID);
+        if (optionalStudent.isEmpty()){
+            throw new RuntimeException("student is not existed");
         }
+
+    return optionalStudent.get();
+
+
     }
 
-    @Override
-    public void findStudentByName(String studentName){
-        for (Student s: studentList) {
-            if(Objects.equals(s.getStudentName(), studentName)){
-                System.out.println(s);
-            }
-        }
-    }
+
     @Override
     public List<Student> findAllFemaleStudent(){
-        for (Student s: studentList) {
+        this.femaleStudentList = new ArrayList<>();
+        for (Student s: studentRepository.findAll()) {
             if (Objects.equals(s.getSex(), "F")){
                 femaleStudentList.add(s);
             }
@@ -97,7 +103,8 @@ public class StudentImplService implements StudentService {
 
     @Override
     public List<Student> findAllMaleStudent(){
-        for (Student s: studentList) {
+        this.maleStudentList = new ArrayList<>();
+        for (Student s: studentRepository.findAll()) {
             if (Objects.equals(s.getSex(), "M")){
                 maleStudentList.add(s);
             }
@@ -107,13 +114,13 @@ public class StudentImplService implements StudentService {
     }
     @Override
     public List<Student> sortStudentByNameAZ(){
-        AZStudentList = studentList.stream().sorted(Comparator.comparing(Student::getStudentName)).collect(Collectors.toList());
+        AZStudentList = studentRepository.findAll().stream().sorted(Comparator.comparing(Student::getStudentName)).collect(Collectors.toList());
 
         return AZStudentList;
     }
     @Override
     public List<Student> sortStudentByNameZA(){
-        ZAStudentList  = studentList.stream().sorted(Comparator.comparing(Student::getStudentName)).collect(Collectors.toList());
+        ZAStudentList  = studentRepository.findAll().stream().sorted(Comparator.comparing(Student::getStudentName)).collect(Collectors.toList());
         Collections.reverse(ZAStudentList);
 
         return ZAStudentList;

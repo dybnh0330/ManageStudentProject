@@ -1,15 +1,20 @@
 package com.example.mvc.service;
 
+import com.example.mvc.dto.MarkRequest;
 import com.example.mvc.model.Mark;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public interface MarkService {
-    void findListMarkOfStudentByID(long studentID);
-    void findMarkByStudentIDAndSubjectID(long studentID, long subjectID);
-    void findSubjectWithHighestMark();
-    void findSubjectWithLowestMark();
-    void addMark(Mark mark);
-    void updateMarkByStudentIDandSubjectID(Mark mark, long studentID, long subjectID);
+    List<Mark> findListMarkOfStudentByID(long studentID);
+
+    Mark findSubjectWithHighestMark();
+    Mark findSubjectWithLowestMark();
+    void addMark(MarkRequest markRequest);
+    void updateMarkByID(Mark mark,long markID);
+
+    List<Mark> findMarkByStudentIDAndSubjectID(long studentID, long subjectID);
 
 }

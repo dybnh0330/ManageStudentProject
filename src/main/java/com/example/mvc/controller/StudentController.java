@@ -1,75 +1,77 @@
 package com.example.mvc.controller;
 
+import com.example.mvc.dto.StudentRequest;
 import com.example.mvc.model.Class;
 import com.example.mvc.model.Student;
 import com.example.mvc.service.ImplService.StudentImplService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("Student")
 public class StudentController {
     @Autowired
     private StudentImplService studentImplService;
-    public StudentController(StudentImplService studentImplService){
-        this.studentImplService = studentImplService;
-    }
 
-    @GetMapping(value = "/student/getAll")
+    @GetMapping(value = "/getAll")
     public List<Student> findAllStudent(){
         return studentImplService.findAllStudent();
     }
 
 
-    @GetMapping(value = "/student/findByID/{id}")
-    public void findStudentById(@PathVariable long id) {
-        studentImplService.findStudentById(id);
+    @GetMapping(value = "/findByID/{id}")
+    public Student findStudentById(@PathVariable long id) {
+       return  studentImplService.findStudentById(id);
     }
 
 
-    @GetMapping(value = "/student/findByName/{name}")
-    public void findStudentByName(@PathVariable String name) {
-        studentImplService.findStudentByName(name);
+
+
+    @PostMapping(value = "/add")
+    public ResponseEntity<String> addStudent(@RequestBody StudentRequest studentRequest) {
+        studentImplService.addStudent(studentRequest);
+        return ResponseEntity.ok().body("\"Add student successfully\"");
+
     }
 
-    @PostMapping(value = "/student/add")
-    public void addStudent(@RequestBody Student student) {
-        studentImplService.addStudent(student);
-    }
-
-    @PutMapping(value = "/student/update/{id}")
-    public void updateStudent(@RequestBody Student student,@PathVariable long id ) {
+    @PutMapping(value = "/update/{id}")
+    public ResponseEntity<String> updateStudent(@RequestBody Student student,@PathVariable long id ) {
         studentImplService.updateStudentByID(student, id);
+        return ResponseEntity.ok().body("\"Add student successfully\"");
+
     }
 
 
-    @DeleteMapping(value = "/student/delete/{id}")
-    public void deleteStudent(@PathVariable long id) {
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<String> deleteStudent(@PathVariable long id) {
         studentImplService.deleteStudentByID(id);
+        return ResponseEntity.ok().body("\"Delete student successfully\"");
 
     }
 
 
-    @GetMapping(value = "/student/findAllFemaleStudent")
+    @GetMapping(value = "/findAllFemaleStudent")
     public List<Student> findAllFemaleStudent() {
         return studentImplService.findAllFemaleStudent();
     }
 
 
-    @GetMapping(value = "/student/findAllMaleStudent")
+    @GetMapping(value = "/findAllMaleStudent")
     public List<Student> findAllMaleStudent() {
         return studentImplService.findAllMaleStudent();
     }
 
 
-    @GetMapping(value = "/student/sortStudentAZ")
+    @GetMapping(value = "/sortStudentAZ")
     public List<Student> sortStudentByNameAZ() {
         return studentImplService.sortStudentByNameAZ();
     }
 
 
-    @GetMapping(value = "/student/sortStudentZA")
+    @GetMapping(value = "/sortStudentZA")
     public List<Student> sortStudentByNameZA() {
         return studentImplService.  sortStudentByNameZA();
     }

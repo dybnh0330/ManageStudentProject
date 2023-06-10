@@ -18,9 +18,8 @@ import javax.persistence.*;
 @Getter
 public class Subject {
     @Id
-
-    @Column(name = "subjectID")
-    private long subjectId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "subjectName")
     private String subjectName;
@@ -31,9 +30,10 @@ public class Subject {
     @JsonIgnore
     private Student student;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "subjectID_mark")
-    private Mark mark;
+
+    @OneToOne(mappedBy = "subject")
+    @JsonIgnore
+    private Mark mark ;
 
 
 

@@ -1,28 +1,27 @@
 package com.example.mvc.service.ImplService;
 
-import com.example.mvc.model.Class;
+
 import com.example.mvc.model.Department;
+import com.example.mvc.repository.ClassRepository;
 import com.example.mvc.repository.DepartmentRepository;
 import com.example.mvc.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+
+import java.util.Optional;
 
 @Service
 public class DepartmentImplService implements DepartmentService {
     @Autowired
     private DepartmentRepository departmentRepository;
-    private List<Class> classList;
-    private List<Department> departmentList;
 
-//    public DepartmentImplService(DepartmentRepository departmentRepository, List<Class> classList, List<Department> departmentList) {
-//        this.departmentRepository = departmentRepository;
-//
-//        this.classList = classList;
-//        this.departmentList = departmentList;
-//    }
+    @Autowired
+    private ClassRepository classRepository;
+
+
+
     @Override
     public void addDepartment(Department department){
         departmentRepository.save(department);
@@ -30,17 +29,13 @@ public class DepartmentImplService implements DepartmentService {
 
     @Override
     public void updateDepartmentByID(Department department, long departmentID){
-        Department departmentFound = null;
-        for (Department d: departmentList) {
-            if(d.getId() == departmentID){
-                    departmentFound = d;
-            }
+        Optional<Department> optionalDepartment = departmentRepository.findById(departmentID);
+        if(optionalDepartment.isEmpty()){
+            throw new RuntimeException("department is not existed");
         }
 
-        assert departmentFound != null;
-        departmentFound.setId(department.getId());
-        departmentFound.setDepartmentName(department.getDepartmentName());
-        departmentRepository.save(departmentFound);
+        optionalDepartment.get().setDepartmentName(department.getDepartmentName());
+        departmentRepository.save(optionalDepartment.get());
 
     }
 
@@ -52,55 +47,27 @@ public class DepartmentImplService implements DepartmentService {
 
 
     @Override
-    public void findByDepartmentID(long departmentID) {
+    public Department findByDepartmentID(long departmentID) {
 
-        for (Department d : departmentList) {
-            if (d.getId() == departmentID) {
-                System.out.println(d);
-                for (Class c : classList) {
-                    if (c.getDepartment().getId() == departmentID) {
-                        System.out.println(c);
-                    }
-
-
-                }
-
-            }
+        Optional<Department> optionalDepartment = departmentRepository.findById(departmentID);
+        if(optionalDepartment.isEmpty()){
+            throw new RuntimeException("department is not existed");
         }
-
+        return optionalDepartment.get();
 
     }
 
-    @Override
-    public void findByDepartmentName(String departmentName) {
-        for (Department d : departmentList) {
-            if (Objects.equals(d.getDepartmentName(), departmentName)) {
-                System.out.println(d);
-                for (Class c : classList) {
-                    if (c.getDepartment().equals(departmentName)) {
-                        System.out.println(c);
-                    }
 
-
-                }
-
-            }
-        }
-
-
-    }
 
     @Override
     public void deleteDepartmentByID(long departmentID){
-        Department departmentFound = null;
-        for (Department d: departmentList) {
-            if(d.getId() == departmentID){
-                departmentFound = d;
-            }
-        }
 
-        assert departmentFound != null;
-        departmentRepository.delete(departmentFound);
+        Optional<Department> optionalDepartment = departmentRepository.findById(departmentID);
+        if(optionalDepartment.isEmpty()){
+            throw new RuntimeException("department is not existed");
+        }
+        departmentRepository.delete(optionalDepartment.get());
+
     }
 
 

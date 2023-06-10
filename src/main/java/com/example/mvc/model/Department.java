@@ -34,5 +34,4 @@ public class Department {
         return classes;
     }
 
-
 }

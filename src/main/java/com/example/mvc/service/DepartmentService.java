@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 @Component
 public interface DepartmentService {
-    void findByDepartmentID(long departmentID);
-    void findByDepartmentName(String departmentName);
+    Department findByDepartmentID(long departmentID);
     List<Department> findAllDepartment();
     void addDepartment(Department department);
     void updateDepartmentByID(Department department, long departmentID);
